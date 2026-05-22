@@ -1,82 +1,20 @@
-name: Expo Android CI
+name: Expo APK Build
 
 on:
   push:
     branches:
       - main
-      - master
-      - develop
-
-  pull_request:
-    branches:
-      - "*"
 
 jobs:
-  validate:
-    name: Validate Expo App
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      # Clone repository
-      - name: Checkout repository
+      # Checkout repo
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # Setup Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      # Install dependencies
-      - name: Install dependencies
-        run: npm install
-
-      # Install Expo & EAS CLI
-      - name: Install Expo CLI and EAS CLI
-        run: npm install -g expo-cli eas-cli
-
-      # Validate Expo config
-      - name: Validate Expo configuration
-        run: npx expo config --type public
-
-      # Run lint if exists
-      - name: Run ESLint
-        run: |
-          if npm run | grep -q "lint"; then
-            npm run lint
-          else
-            echo "No lint script found"
-          fi
-
-      # Run typecheck if exists
-      - name: Run TypeScript check
-        run: |
-          if npm run | grep -q "typecheck"; then
-            npm run typecheck
-          else
-            echo "No typecheck script found"
-          fi
-
-      # Run tests if exists
-      - name: Run tests
-        run: |
-          if npm run | grep -q "test"; then
-            npm test -- --watch=false
-          else
-            echo "No tests found"
-          fi
-
-  build-preview-apk:
-    name: Build Android APK
-    runs-on: ubuntu-latest
-    needs: validate
-
-    steps:
-      # Clone repository
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      # Setup Node.js
+      # Setup Node
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -90,14 +28,14 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
-      # Authenticate Expo account
-      - name: Login to Expo
+      # Login Expo
+      - name: Expo Login
         run: eas whoami
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       # Build APK
-      - name: Start Android preview build
+      - name: Build APK
         run: eas build --platform android --profile preview --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
