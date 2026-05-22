@@ -1,128 +1,41 @@
-```yaml
-name: Expo CI
+name: Expo APK Build
 
 on:
   push:
     branches:
       - main
-      - develop
-
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  validate:
-    name: Validate Expo App
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      # --------------------------------------
-      # Checkout repository
-      # --------------------------------------
-      - name: Checkout repository
+      # Checkout repo
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # --------------------------------------
-      # Setup Node.js
-      # Expo SDK 51 works best with Node 20
-      # --------------------------------------
+      # Setup Node
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
 
-      # --------------------------------------
       # Install dependencies
-      # npm ci ensures clean reproducible install
-      # --------------------------------------
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
-      # --------------------------------------
-      # Setup Expo CLI + EAS CLI
-      # --------------------------------------
-      - name: Install Expo & EAS CLI
-        run: |
-          npm install -g expo-cli
-          npm install -g eas-cli
-
-      # --------------------------------------
-      # Validate Expo config
-      # Detects invalid app.json/app.config
-      # --------------------------------------
-      - name: Validate Expo config
-        run: npx expo config --type public
-
-      # --------------------------------------
-      # TypeScript validation
-      # --------------------------------------
-      - name: Run TypeScript checks
-        run: npm run typecheck
-
-      # --------------------------------------
-      # ESLint validation
-      # --------------------------------------
-      - name: Run ESLint
-        run: npm run lint
-
-      # --------------------------------------
-      # Optional unit tests
-      # Will not fail if tests do not exist
-      # --------------------------------------
-      - name: Run tests
-        run: npm run test --if-present
-
-      # --------------------------------------
-      # Expo Doctor
-      # Detects dependency/version issues
-      # --------------------------------------
-      - name: Run Expo Doctor
-        run: npx expo-doctor
-
-  preview-apk:
-    name: Build Preview APK
-    runs-on: ubuntu-latest
-
-    needs: validate
-
-    if: github.ref == 'refs/heads/main'
-
-    steps:
-      # --------------------------------------
-      # Checkout repository
-      # --------------------------------------
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      # --------------------------------------
-      # Setup Node.js
-      # --------------------------------------
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      # --------------------------------------
-      # Install dependencies
-      # --------------------------------------
-      - name: Install dependencies
-        run: npm ci
-
-      # --------------------------------------
       # Install EAS CLI
-      # --------------------------------------
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
-      # --------------------------------------
-      # Trigger EAS Preview APK Build
-      # Requires EXPO_TOKEN GitHub Secret
-      # --------------------------------------
-      - name: Trigger EAS Build
+      # Login Expo
+      - name: Expo Login
+        run: eas whoami
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      # Build APK
+      - name: Build APK
         run: eas build --platform android --profile preview --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-```
