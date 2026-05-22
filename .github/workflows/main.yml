@@ -6,6 +6,7 @@ on:
       - main
       - master
       - develop
+
   pull_request:
     branches:
       - "*"
@@ -16,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout repository
-      - name: Checkout project
+      # Clone repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       # Setup Node.js
@@ -25,21 +26,20 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
 
       # Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # Setup Expo & EAS
-      - name: Setup Expo and EAS
+      # Install Expo & EAS CLI
+      - name: Install Expo CLI and EAS CLI
         run: npm install -g expo-cli eas-cli
 
-      # Check Expo configuration
-      - name: Validate Expo config
+      # Validate Expo config
+      - name: Validate Expo configuration
         run: npx expo config --type public
 
-      # Run lint if available
+      # Run lint if exists
       - name: Run ESLint
         run: |
           if npm run | grep -q "lint"; then
@@ -48,7 +48,7 @@ jobs:
             echo "No lint script found"
           fi
 
-      # Run TypeScript check if available
+      # Run typecheck if exists
       - name: Run TypeScript check
         run: |
           if npm run | grep -q "typecheck"; then
@@ -57,23 +57,23 @@ jobs:
             echo "No typecheck script found"
           fi
 
-      # Run tests if available
+      # Run tests if exists
       - name: Run tests
         run: |
           if npm run | grep -q "test"; then
             npm test -- --watch=false
           else
-            echo "No test script found"
+            echo "No tests found"
           fi
 
-  build-android-preview:
+  build-preview-apk:
     name: Build Android APK
     runs-on: ubuntu-latest
     needs: validate
 
     steps:
-      # Checkout repository
-      - name: Checkout project
+      # Clone repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       # Setup Node.js
@@ -81,7 +81,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
 
       # Install dependencies
       - name: Install dependencies
@@ -91,14 +90,14 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
-      # Login to Expo using GitHub Secret
-      - name: Authenticate with Expo
+      # Authenticate Expo account
+      - name: Login to Expo
         run: eas whoami
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      # Start Android preview build
-      - name: Build Android APK
+      # Build APK
+      - name: Start Android preview build
         run: eas build --platform android --profile preview --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
