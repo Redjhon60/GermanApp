@@ -43,7 +43,7 @@
     "react-native-progress": "^5.0.1",
     "react-native-confetti-cannon": "^1.5.2",
     "react-native-tts": "^4.1.0",
-    "react-native-voice": "^3.2.4",
+    "@react-native-voice/voice": "^3.2.4",
     "axios": "^1.7.2",
     "zustand": "^4.5.4",
     "date-fns": "^3.6.0",
