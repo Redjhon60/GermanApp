@@ -1,6 +1,8 @@
+```json
 {
   "cli": {
-    "version": ">= 9.0.0"
+    "version": ">= 16.0.0",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
@@ -10,6 +12,7 @@
         "buildType": "apk"
       }
     },
+
     "preview": {
       "distribution": "internal",
       "android": {
@@ -19,7 +22,9 @@
         "APP_ENV": "preview"
       }
     },
+
     "production": {
+      "autoIncrement": true,
       "android": {
         "buildType": "app-bundle"
       },
@@ -27,6 +32,7 @@
         "APP_ENV": "production"
       }
     },
+
     "production-apk": {
       "distribution": "internal",
       "android": {
@@ -37,6 +43,7 @@
       }
     }
   },
+
   "submit": {
     "production": {
       "android": {
@@ -46,3 +53,4 @@
     }
   }
 }
+```
